@@ -1,0 +1,45 @@
+.header-title {
+    font-size: 24px;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 30px;
+    text-align: center;
+}
+
+#todo-form {
+    text-align: center;
+}
+
+.todo-stats  {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+.todo-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+}
+
+#todo-list {
+    max-width: 600px;
+    width: 100%;
+    list-style-type: none;
+    padding-left: 0;
+    margin: 0;
+    border-radius: 5px;
+}
+
+#todo-list li {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 8px 0;
+}
+
+.delete-btn {
+    margin-left: auto; /* 右端に寄せる */
+}
+
