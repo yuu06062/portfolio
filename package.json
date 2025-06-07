@@ -1,14 +1,23 @@
 {
   "name": "portfolio",
-  "scripts": {
-    "dev": "wrangler dev",
-    "deploy": "wrangler deploy --minify",
-    "cf-typegen": "wrangler types --env-interface CloudflareBindings"
-  },
+  "version": "1.0.0",
+  "private": true,
   "dependencies": {
-    "hono": "^4.7.10"
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "typescript": "^5.0.0"
+  },
+  "scripts": {
+    "start": "webpack serve --mode development --open",
+    "build": "webpack --mode production"
   },
   "devDependencies": {
-    "wrangler": "^4.4.0"
+    "@types/react": "^19.1.6",
+    "@types/react-dom": "^19.1.6",
+    "html-webpack-plugin": "^5.5.0",
+    "ts-loader": "^9.4.4",
+    "webpack": "^5.88.0",
+    "webpack-cli": "^5.1.4",
+    "webpack-dev-server": "^4.15.1"
   }
 }

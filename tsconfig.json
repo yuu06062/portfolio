@@ -1,14 +1,13 @@
 {
   "compilerOptions": {
-    "target": "ESNext",
+    "target": "ES6",
     "module": "ESNext",
-    "moduleResolution": "Bundler",
-    "strict": true,
-    "skipLibCheck": true,
-    "lib": [
-      "ESNext"
-    ],
     "jsx": "react-jsx",
-    "jsxImportSource": "hono/jsx"
+    "moduleResolution": "node",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true
   },
+  "include": ["src"]
 }
