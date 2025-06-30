@@ -5,14 +5,26 @@ import sqlite3 from "sqlite3";
 const app = express();
 const PORT = 4000;
 
+
+app.use(cors());
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+console.log("express.json() loaded");
+
 // SQLiteデータベースファイルを作成・接続
 const db = new sqlite3.Database("todos.db");
 
 // テーブルがなければ作成
 db.run("CREATE TABLE IF NOT EXISTS todos (id INTEGER PRIMARY KEY AUTOINCREMENT, text TEXT, completed INTEGER)");
 
-app.use(cors());
-app.use(express.json());
+db.run(`
+  CREATE TABLE IF NOT EXISTS users (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    username TEXT UNIQUE,
+    password TEXT
+  )
+`);
+
 
 // TODO一覧取得API
 app.get("/api/todos", (req, res) => {
@@ -65,6 +77,33 @@ app.delete("/api/todos/:id", (req, res) => {
   });
 });
 
+
+
+app.post("/api/register", (req, res) => {
+  console.log("register called", req.body); // ←追加
+  const { username, password } = req.body;
+  db.run(
+    "INSERT INTO users (username, password) VALUES (?, ?)",
+    [username, password],
+    function (err) {
+      if (err) {
+        res.status(400).json({ error: "ユーザー名が既に使われています" });
+        return;
+      }
+      res.json({ id: this.lastID, username });
+    }
+  );
+});
+
+
+// サーバー起動
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
+  // setTimeout(() => {
+  //   console.log(
+  //     app._router.stack
+  //       .filter((r: any) => r.route)
+  //       .map((r: any) => r.route.path + ' [' + Object.keys(r.route.methods).join(',').toUpperCase() + ']')
+  //   );
+  // }, 100);
 });
