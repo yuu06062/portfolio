@@ -1,3 +1,5 @@
+console.log("=== THIS IS THE index.ts YOU ARE EDITING ===");
+
 import express from "express";
 import cors from "cors";
 import sqlite3 from "sqlite3";
@@ -28,7 +30,8 @@ db.run(`
 
 // TODO一覧取得API
 app.get("/api/todos", (req, res) => {
-  db.all("SELECT * FROM todos", (err, rows) => {
+  const user_id = req.query.user_id;
+  db.all("SELECT * FROM todos WHERE user_id = ?", [user_id], (err, rows) => {
     if (err) {
       res.status(500).json({ error: err.message });
       return;
@@ -44,14 +47,18 @@ app.get("/cors-test", (req, res) => {
 
 // TODO追加API
 app.post("/api/todos", (req, res) => {
-  const { text } = req.body;
-  db.run("INSERT INTO todos (text, completed) VALUES (?, ?)", [text, 0], function (err) {
-    if (err) {
-      res.status(500).json({ error: err.message });
-      return;
+  const { text, user_id } = req.body;
+  db.run(
+    "INSERT INTO todos (text, completed, user_id) VALUES (?, ?, ?)",
+    [text, 0, user_id],
+    function (err) {
+      if (err) {
+        res.status(500).json({ error: err.message });
+        return;
+      }
+      res.json({ id: this.lastID, text, completed: 0, user_id });
     }
-    res.json({ id: this.lastID, text, completed: 0 });
-  });
+  );
 });
 
 // TODO完了状態の更新API
@@ -95,6 +102,24 @@ app.post("/api/register", (req, res) => {
   );
 });
 
+app.post("/api/login", (req, res) => {
+  const { username, password } = req.body;
+  db.get(
+    "SELECT * FROM users WHERE username = ? AND password = ?",
+    [username, password],
+    (err, row: any) => { 
+      if (err) {
+        res.status(500).json({ error: "DBエラー" });
+        return;
+      }
+      if (!row) {
+        res.status(401).json({ error: "ユーザー名またはパスワードが違います" });
+        return;
+      }
+      res.json({ id: row.id, username: row.username });
+    }
+  );
+});
 
 // サーバー起動
 app.listen(PORT, () => {

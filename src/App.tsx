@@ -1,4 +1,7 @@
 import React, { useEffect, useState } from "react";
+import Login from "./Login";
+import Register from "./Register";
+
 
 type Todo = {
   id: number;
@@ -7,24 +10,43 @@ type Todo = {
 };
 
 const App: React.FC = () => {
+  const [user, setUser] = useState<any>(null); 
   const [text, setText] = useState("");
   const [todos, setTodos] = useState<Todo[]>([]);
+const [showRegister, setShowRegister] = useState(false);
+ 
 
-  // TODO一覧取得
-  useEffect(() => {
-    fetch("http://localhost:4000/api/todos")
-      .then(res => res.json())
-      .then(data => setTodos(data));
-  }, []);
+ // TODO一覧取得
+useEffect(() => {
+  if (user) {
+    fetch(`http://localhost:4000/api/todos?user_id=${user.id}`)
+  .then(res => res.json())
+  .then(data => setTodos(data));
+  }
+}, [user]);
+
+if (!user) {
+  if (showRegister) {
+    // 新規登録画面を表示
+    return <Register onRegister={() => setShowRegister(false)} />;
+  }
+  // ログイン画面＋新規登録ボタンを表示
+  return (
+    <div>
+      <Login onLogin={setUser} />
+      <button onClick={() => setShowRegister(true)}>新規登録はこちら</button>
+    </div>
+  );
+}
 
   // TODO追加
   const addTodo = () => {
     if (text.trim() === "") return;
     fetch("http://localhost:4000/api/todos", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ text }),
-    })
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({ text, user_id: user.id }),
+})
       .then(res => res.json())
       .then(newTodo => {
         setTodos([...todos, newTodo]);
@@ -58,34 +80,45 @@ const App: React.FC = () => {
     });
   };
 
-  return (
-    <div style={{ padding: "2rem", fontFamily: "sans-serif" }}>
+return (
+  <div style={{ padding: "2rem", fontFamily: "sans-serif" }}>
+    <div style={{ display: "flex", alignItems: "center" }}>
       <h1>TODOリスト</h1>
-      <input
-        value={text}
-        onChange={e => setText(e.target.value)}
-        placeholder="やることを入力"
-      />
-      <button onClick={addTodo}>追加</button>
-      <ul>
-        {todos.map(todo => (
-          <li key={todo.id} style={{ margin: "8px 0" }}>
-            <span
-              onClick={() => toggleTodo(todo.id)}
-              style={{
-                textDecoration: todo.completed ? "line-through" : "none",
-                cursor: "pointer",
-                marginRight: "1rem",
-              }}
-            >
-              {todo.text}
-            </span>
-            <button onClick={() => deleteTodo(todo.id)}>削除</button>
-          </li>
-        ))}
-      </ul>
+      <button
+        onClick={() => setUser(null)}
+        style={{
+          marginLeft: "190px", // 5センチ分のスペース
+        }}
+      >
+        ログアウト
+      </button>
     </div>
-  );
-};
+    {/* 以下はそのまま */}
+    <input
+      value={text}
+      onChange={e => setText(e.target.value)}
+      placeholder="やることを入力"
+    />
+    <button onClick={addTodo}>追加</button>
+    <ul>
+      {todos.map(todo => (
+        <li key={todo.id} style={{ margin: "8px 0" }}>
+          <span
+            onClick={() => toggleTodo(todo.id)}
+            style={{
+              textDecoration: todo.completed ? "line-through" : "none",
+              cursor: "pointer",
+              marginRight: "1rem",
+            }}
+          >
+            {todo.text}
+          </span>
+          <button onClick={() => deleteTodo(todo.id)}>削除</button>
+        </li>
+      ))}
+    </ul>
+  </div>
+);
+}
 
 export default App;
