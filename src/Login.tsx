@@ -1,6 +1,7 @@
 import React, { useState } from "react";
+import { User, LoginResponse, ErrorResponse, isLoginResponse, isErrorResponse } from "./types/index";
 
-export default function Login({ onLogin }: { onLogin: (user: any) => void }) {
+export default function Login({ onLogin }: { onLogin: (user: User) => void }) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -16,9 +17,17 @@ export default function Login({ onLogin }: { onLogin: (user: any) => void }) {
       });
       const data = await res.json();
       if (res.ok) {
-        onLogin(data);
+        if (isLoginResponse(data)) {
+          onLogin(data);
+        } else {
+          setError("レスポンスの形式が正しくありません");
+        }
       } else {
-        setError(data.error || "ログイン失敗");
+        if (isErrorResponse(data)) {
+          setError(data.error);
+        } else {
+          setError("ログイン失敗");
+        }
       }
     } catch {
       setError("通信エラー");
