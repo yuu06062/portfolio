@@ -1,16 +1,10 @@
 import React, { useEffect, useState } from "react";
 import Login from "./Login";
 import Register from "./Register";
-
-
-type Todo = {
-  id: number;
-  text: string;
-  completed: number;
-};
+import { User, Todo, TodoResponse } from "./types/index";
 
 const App: React.FC = () => {
-  const [user, setUser] = useState<any>(null); 
+  const [user, setUser] = useState<User | null>(null); 
   const [text, setText] = useState("");
   const [todos, setTodos] = useState<Todo[]>([]);
 const [showRegister, setShowRegister] = useState(false);
@@ -48,7 +42,7 @@ if (!user) {
   body: JSON.stringify({ text, user_id: user.id }),
 })
       .then(res => res.json())
-      .then(newTodo => {
+      .then((newTodo: TodoResponse) => {
         setTodos([...todos, newTodo]);
         setText("");
       });
